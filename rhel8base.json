@@ -1,0 +1,44 @@
+{
+  "variables": {
+  },
+  "builders": [
+    {
+      "type":"qemu",
+      "iso_url": "rhel-8.0-beta-1-x86_64-dvd.iso",
+      "iso_checksum": "06bec9e7de3ebfcdb879804be8c452b69ba3e046daedac3731e1ccd169cfd316",
+      "iso_checksum_type":"sha256",
+      "output_directory": "rhel8-qcow2",
+      "shutdown_command": "sudo systemctl poweroff",
+      "format": "qcow2",
+      "accelerator": "kvm",
+      "http_directory":"http",
+      "ssh_username":"root",
+      "ssh_password":"r00tpassW0rd",
+      "ssh_timeout":"15m",
+      "vm_name":"rhel8base",
+      "net_device":"virtio-net",
+      "disk_interface":"virtio",
+      "boot_wait":"10s",
+      "boot_command": [
+        "<up><wait><tab> text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/rhel8-ks.cfg net.ifnames=0<enter><wait>"
+      ],
+      "qemuargs":[
+        ["-m","1024M"]
+      ]
+    }
+  ],
+  "provisioners": [
+     { "type": "shell", "inline": ["echo 'vagrant ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/vagrant"," mkdir /home/vagrant/.ssh"," chmod 700 /home/vagrant/.ssh "] },
+     { "type": "file", "source": "vagrant.pub", "destination": "/home/vagrant/.ssh/authorized_keys"},
+     { "type": "shell", "inline": [
+         "chown -R vagrant: /home/vagrant",
+         "chmod 600 /home/vagrant/.ssh/authorized_keys",
+         "sed -i 's/rhgb quiet/net.ifnames=0/' /etc/default/grub"
+       ]
+     },
+     {
+       "type": "ansible", "playbook_file": "playbook.yml", "user": "vagrant", "extra_arguments": "-e ansible_python_interpreter=/usr/libexec/platform-python"
+     }
+  ],
+  "post-processors": [{ "type":"vagrant", "keep_input_artifacts":"true" }]
+}

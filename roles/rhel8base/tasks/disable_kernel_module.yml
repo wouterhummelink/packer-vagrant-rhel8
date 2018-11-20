@@ -1,0 +1,7 @@
+---
+- name: write module blacklist file
+  kernel_blacklist:
+    name: "{{ module }}" # required. Name of kernel module to black- or whitelist.
+    blacklist_file: "/etc/modprobe.d/blacklist-{{ module }}.conf" # not required. If specified, use this blacklist file instead of C(/etc/modprobe.d/blacklist-ansible.conf)
+    state: present # not required. choices: absent;present. Whether the module should be present in the blacklist or absent.
+  notify: regenerate initramfs

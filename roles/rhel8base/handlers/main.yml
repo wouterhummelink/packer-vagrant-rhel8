@@ -1,0 +1,4 @@
+---
+# handlers file for rhel8base
+- name: regenerate initramfs
+  command: dracut -f --regenerate-all

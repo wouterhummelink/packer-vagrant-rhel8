@@ -1,0 +1,20 @@
+---
+
+- debug:
+    var: mount
+
+- name: get current mount options
+  set_fact: 
+    mount_info_cur: "{{ ansible_mounts | selectattr('mount','equalto',mount.mount) | list | first }}"
+- name: set options
+  set_fact:
+    mount_info: "{{ mount_info_cur | combine(mount) }}"
+
+- name: set mount options
+  mount:
+    src: "{{ mount_info.device }}"
+    fstype: "{{ mount_info.fstype }}"
+    path: "{{ mount_info.mount }}"
+    passno: "{{ mount_info.passno | default(2) }}"
+    opts: "{{ mount_info.options }}"
+    state: mounted

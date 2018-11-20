@@ -1,0 +1,4 @@
+*.retry
+*.iso
+*.box
+packer_cache

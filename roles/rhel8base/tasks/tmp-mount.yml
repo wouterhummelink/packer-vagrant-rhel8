@@ -1,0 +1,16 @@
+---
+- name: create drop in directory
+  file:
+    path: /etc/systemd/system/tmp.mount.d
+    state: directory
+
+- name: copy systemd dropin
+  copy:
+    dest: /etc/systemd/system/tmp.mount.d/install.conf
+    src: tmp.mount.conf
+
+- name: enable & start tmp mount
+  systemd:
+    name: tmp.mount
+    state: started
+    enabled: true
